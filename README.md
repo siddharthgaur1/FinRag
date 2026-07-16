@@ -1,5 +1,7 @@
 # FinRAG
 
+[![CI](https://github.com/siddharthgaur1/finrag/actions/workflows/ci.yml/badge.svg)](https://github.com/siddharthgaur1/finrag/actions/workflows/ci.yml) [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Financial documents — annual reports, RBI circulars, SEBI filings — are long,
 dense PDFs that don't hold up to keyword search or a single embedding lookup:
 a question like "what changed in the RBI repo rate circular" needs an exact
