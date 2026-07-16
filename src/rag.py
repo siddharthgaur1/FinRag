@@ -17,6 +17,10 @@ from pathlib import Path
 
 import chromadb
 from chromadb.utils import embedding_functions
+from dotenv import load_dotenv
+
+# Must run before the key is read below, so a .env file (see .env.example) works.
+load_dotenv()
 
 # ── LLM backend ──────────────────────────────────────────────────
 try:
