@@ -97,10 +97,26 @@ with st.sidebar:
     # PDF upload
     st.markdown("**⬆️ Upload new PDF**")
     uploaded_file = st.file_uploader("Drop a PDF here", type=["pdf"], label_visibility="collapsed")
+    MAX_UPLOAD_MB = 25
     if uploaded_file:
-        dest = DOCS_DIR / uploaded_file.name
+        # Never trust the client-supplied name: strip it to a bare filename so a
+        # crafted "../../etc/whatever" cannot write outside the documents dir, and
+        # confirm the write target really resolves inside DOCS_DIR before touching
+        # disk. Cap the size so a huge upload can't fill the container.
         DOCS_DIR.mkdir(parents=True, exist_ok=True)
-        dest.write_bytes(uploaded_file.read())
+        safe_name = Path(uploaded_file.name).name
+        dest = (DOCS_DIR / safe_name).resolve()
+        data = uploaded_file.getvalue()
+        if not safe_name.lower().endswith(".pdf"):
+            st.error("Only .pdf files are accepted.")
+            st.stop()
+        if dest.parent != DOCS_DIR.resolve():
+            st.error("Invalid filename.")
+            st.stop()
+        if len(data) > MAX_UPLOAD_MB * 1024 * 1024:
+            st.error(f"File too large (> {MAX_UPLOAD_MB} MB).")
+            st.stop()
+        dest.write_bytes(data)
         if st.button("Ingest now"):
             with st.spinner(f"Ingesting {uploaded_file.name}…"):
                 result = subprocess.run(
