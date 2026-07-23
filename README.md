@@ -1,6 +1,41 @@
 # FinRAG
 
-[![CI](https://github.com/siddharthgaur1/finrag/actions/workflows/ci.yml/badge.svg)](https://github.com/siddharthgaur1/finrag/actions/workflows/ci.yml) [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+**Hybrid (dense + keyword) RAG over financial PDFs, with page-cited answers and a hallucination guard. Local embeddings — retrieval needs no API key.**
+
+[![CI](https://github.com/siddharthgaur1/finrag/actions/workflows/ci.yml/badge.svg)](https://github.com/siddharthgaur1/finrag/actions/workflows/ci.yml) [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Runs free with Ollama](https://img.shields.io/badge/runs%20free-Ollama%20%7C%20local%20embeddings-brightgreen)](#run-with-zero-paid-keys)
+
+> **Live demo:** not hosted as a zero-key click-through — FinRAG needs both an
+> ingested corpus and an LLM to generate answers. It runs **entirely free
+> locally**: embeddings/retrieval use a local sentence-transformers model (no
+> key), and generation runs on a local Ollama model (no key). See below.
+
+## Run with zero paid keys
+
+```bash
+git clone https://github.com/siddharthgaur1/finrag
+cd finrag
+pip install -r requirements.txt
+
+python scripts/download_sample_docs.py   # a few public financial PDFs
+python src/ingest.py                      # local embeddings — no key needed
+
+# Generation, pick one (both free):
+#  A) Local Ollama:  install https://ollama.com, then `ollama pull llama3.2`
+#  B) Anthropic key (paid): export ANTHROPIC_API_KEY=...
+streamlit run src/app.py
+```
+
+The **retrieval half is fully keyless** — sentence-transformers embeddings and a
+local Chroma index, nothing leaves the machine. Only answer *generation* needs a
+model, and Ollama covers that for free/offline. Security notes, including the PDF
+upload hardening and the RAG prompt-injection threat model:
+[SECURITY.md](SECURITY.md).
+
+| Variable | Required | Default | How to get it free |
+| --- | --- | --- | --- |
+| `ANTHROPIC_API_KEY` | No | _(empty)_ | Paid — skip it and use Ollama (free/local) for generation. |
+
+---
 
 Financial documents — annual reports, RBI circulars, SEBI filings — are long,
 dense PDFs that don't hold up to keyword search or a single embedding lookup:
