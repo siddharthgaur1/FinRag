@@ -87,9 +87,9 @@ def ingest(reset: bool = False):
         try:
             client.delete_collection(COLLECTION_NAME)
             print("Existing collection deleted.")
-        except Exception as e:
-            # Expected on a fresh DB (no collection to delete yet); print so a
-            # real failure (corrupt DB, permissions) isn't silently swallowed.
+        except Exception as e:  # noqa: BLE001 - expected on a fresh DB (no collection to
+            # delete yet); print so a real failure (corrupt DB, permissions) isn't silently
+            # swallowed.
             print(f"No existing collection to delete ({e})")
 
     embed_fn = embedding_functions.SentenceTransformerEmbeddingFunction(

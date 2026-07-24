@@ -83,8 +83,7 @@ def _chat(messages: list[dict], system: str = "", temperature: float = 0.1, stre
                 system=sys_prompt,
                 messages=user_msgs,
             ) as s:
-                for text in s.text_stream:
-                    yield text
+                yield from s.text_stream
         else:
             resp = client.messages.create(
                 model=LLM_MODEL_ANTHROPIC,
@@ -292,7 +291,7 @@ class FinRAG:
                 system=FAITHFULNESS_PROMPT,
             )
             return "UNFAITHFUL" if "UNFAITHFUL" in verdict.upper() else "FAITHFUL"
-        except Exception:
+        except Exception:  # noqa: BLE001 - a failed faithfulness check must not fail the answer
             return "UNKNOWN"
 
     def clear_memory(self):

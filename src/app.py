@@ -21,7 +21,7 @@ from pathlib import Path
 import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from rag import FinRAG, LLM_MODEL_OLLAMA, _USE_ANTHROPIC
+from rag import _USE_ANTHROPIC, LLM_MODEL_OLLAMA, FinRAG
 
 DOCS_DIR = Path(__file__).resolve().parent.parent / "data" / "documents"
 INGEST_SCRIPT = Path(__file__).resolve().parent / "ingest.py"
@@ -121,7 +121,7 @@ with st.sidebar:
             with st.spinner(f"Ingesting {uploaded_file.name}…"):
                 result = subprocess.run(
                     [sys.executable, str(INGEST_SCRIPT)],
-                    capture_output=True, text=True
+                    capture_output=True, text=True, check=False
                 )
             if result.returncode == 0:
                 st.success("Ingested! Refresh the page to query.")
