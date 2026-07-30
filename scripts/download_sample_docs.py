@@ -15,9 +15,9 @@ DOCS_DIR.mkdir(parents=True, exist_ok=True)
 # Public financial documents (URLs may change over time - if one fails,
 # manually download any annual report / RBI circular PDF instead)
 SAMPLES = {
-    # RBI Annual Report (public domain)
-    "RBI_Annual_Report.pdf":
-        "https://rbidocs.rbi.org.in/rdocs/AnnualReport/PDFs/0RBIAR2023240579316CB7634D9F90AB75973A4132C3.PDF",
+    # SEC investor-education guide to reading a 10-K (public domain, stable URL)
+    "SEC_How_to_Read_a_10-K.pdf":
+        "https://www.sec.gov/files/reada10k.pdf",
 }
 
 HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
@@ -31,8 +31,14 @@ def download(name: str, url: str):
     print(f"Downloading {name} ...")
     try:
         req = urllib.request.Request(url, headers=HEADERS)
-        with urllib.request.urlopen(req, timeout=60) as resp, open(dest, "wb") as f:
-            f.write(resp.read())
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            data = resp.read()
+        if not data.startswith(b"%PDF"):
+            # A dead/redirected URL often still returns HTTP 200 with an HTML
+            # error page -- fail loudly here instead of silently writing garbage
+            # that only surfaces as a cryptic pypdf crash during ingest.
+            raise ValueError(f"response is not a PDF (got {data[:20]!r})")
+        dest.write_bytes(data)
         print(f"  Saved to {dest}")
     except Exception as e:
         print(f"  Failed: {e}")
